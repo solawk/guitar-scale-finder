@@ -1,81 +1,55 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#141815">
-  <meta name="description" content="Выберите ноты на гитарном грифе и найдите подходящие гаммы. 24 лада, 13 типов гамм, все 12 тоник. Без библиотек.">
-  <title>ЛАД — от нот к гамме</title>
+  <meta name="description" content="Guitar scale finder, chord identifier, sequence analyzer and progression builder. Standard tuning, open strings and 24 frets.">
+  <title>Guitar Utilities</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
   <header class="site-header">
-    <a href="./" class="brand" aria-label="ЛАД — на главную">
-      <svg viewBox="0 0 30 30" aria-hidden="true"><path d="M7 4v22M15 4v22M23 4v22M3 10h24M3 20h24"/><circle cx="15" cy="15" r="3"/></svg>
-      <span>ЛАД<span class="brand-dot">.</span></span>
-    </a>
-    <span class="header-label">ПРОСТРАНСТВО ДЛЯ ИМПРОВИЗАЦИИ</span>
-    <button class="help-button" id="help-open" aria-haspopup="dialog"><span class="help-icon">?</span> Как это работает</button>
+    <a href="#scales" class="brand" aria-label="Guitar Utilities home"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M7 4v22M15 4v22M23 4v22M3 10h24M3 20h24"/><circle cx="15" cy="15" r="3"/></svg><span>Guitar Utilities</span></a>
+    <div class="header-actions"><div class="notation-control" role="group" aria-label="Note spelling"><button id="sharps" class="is-current" aria-pressed="true" title="Use sharps">♯</button><button id="flats" aria-pressed="false" title="Use flats">♭</button></div><button class="help-button" id="help-open" aria-haspopup="dialog"><span class="help-icon">?</span> Help</button></div>
   </header>
-
   <main>
-    <section class="intro" aria-labelledby="page-title">
-      <div>
-        <p class="eyebrow"><span></span> КОНСТРУКТОР ГИТАРНЫХ ГАММ</p>
-        <h1 id="page-title">От нот — к <em>гамме.</em></h1>
-        <p class="intro-description">Выберите ноты на грифе. Найдите гаммы, в которых они звучат.</p>
+    <nav class="tool-tabs" role="tablist" aria-label="Guitar tools"><button role="tab" id="scales-tab" aria-controls="scale-panel" aria-selected="true" tabindex="0">Scale finder</button><button role="tab" id="chords-tab" aria-controls="chord-panel" aria-selected="false" tabindex="-1">Chords &amp; progressions</button></nav>
+    <div id="scale-panel" role="tabpanel" aria-labelledby="scales-tab">
+      <div class="tool-heading"><div><h1>Scale finder</h1><p>Select notes to find scales that contain them.</p></div><button class="text-button" id="example">Try E · G · B <span aria-hidden="true">↗</span></button></div>
+      <section class="fretboard-card" aria-labelledby="fretboard-title">
+        <div class="card-toolbar"><div class="section-title"><span class="section-number">01</span><h2 id="fretboard-title">Fretboard</h2><span class="tuning-badge">E A D G B E</span></div><label class="switch-label"><input type="checkbox" id="show-names"><span class="switch" aria-hidden="true"></span><span>All note names</span></label></div>
+        <div class="fretboard-scroll" id="fretboard-scroll" tabindex="0" aria-label="Guitar fretboard. Scroll horizontally for all 24 frets."><div class="fretboard" id="fretboard" role="group" aria-label="Scale notes: 6 strings, frets 0 to 24"></div></div>
+        <div class="board-caption"><div class="legend"><span><i class="legend-dot selected-dot"></i> Selected</span><span><i class="legend-dot scale-dot"></i> Scale note</span><span><i class="legend-dot tonic-dot"></i> Tonic</span></div><span class="board-hint">0 = open string <span class="mobile-scroll-hint">· scroll →</span></span></div>
+        <div class="selection-bar"><div class="selection-content"><span class="selection-label">SELECTED <span id="note-count">0</span></span><div class="note-chips" id="selected-notes" aria-label="Selected pitch classes"></div></div><button class="clear-button" id="clear" disabled>Clear selection</button></div>
+      </section>
+      <section class="results-section" aria-labelledby="results-title">
+        <div class="results-heading"><div class="section-title"><span class="section-number">02</span><h2 id="results-title">Matching scales</h2><span class="match-badge" id="match-badge">156 <span>/ 156</span></span></div><span class="results-hint">Click a scale to toggle its fretboard overlay.</span></div>
+        <div class="scale-inspector" id="scale-inspector" hidden><div class="inspector-name"><span class="inspector-eyebrow">ON THE FRETBOARD</span><strong id="active-scale-name"></strong><span id="active-scale-fit"></span></div><div id="active-scale-notes" class="scale-note-list" aria-label="Scale notes and degrees"></div><button class="inspector-close" id="hide-scale" aria-label="Hide scale" title="Hide scale">×</button></div>
+        <p class="no-matches" id="no-matches" hidden>No matching scales. Remove a selected note or click any scale to compare it.</p>
+        <div class="table-scroll" tabindex="0" aria-label="Scales by type and tonic. Scroll horizontally to see all tonics."><table id="scale-table"><caption class="sr-only">Scale types in rows, 12 tonics in columns. Dimmed cells do not contain every selected note.</caption><thead><tr id="tonic-headings"><th scope="col" class="scale-label-heading">SCALE / TONIC <span aria-hidden="true">→</span></th></tr></thead><tbody id="scale-rows"></tbody></table></div>
+        <div class="table-caption"><span id="results-description" role="status" aria-live="polite" aria-atomic="true"></span><div class="table-legend"><span><i class="available-dot"></i> Contains all notes</span><span><i class="muted-dot"></i> Does not match</span></div></div>
+      </section>
+    </div>
+    <div id="chord-panel" role="tabpanel" aria-labelledby="chords-tab" hidden>
+      <div class="tool-heading"><div><h1>Chords &amp; progressions</h1><p>Set a chord on the fretboard, then save it or use it in a progression.</p></div><button class="text-button" id="chord-example">Try E5 <span aria-hidden="true">↗</span></button></div>
+      <section class="fretboard-card chord-board-card" aria-labelledby="chord-board-title">
+        <div class="card-toolbar"><div class="section-title"><span class="section-number">01</span><h2 id="chord-board-title">Chord fretboard</h2><span class="tuning-badge">E A D G B E</span></div><label class="switch-label"><input type="checkbox" id="chord-show-names"><span class="switch" aria-hidden="true"></span><span>All note names</span></label></div>
+        <div class="fretboard-scroll" id="chord-fretboard-scroll" tabindex="0" aria-label="Chord fretboard. Scroll horizontally for all 24 frets."><div class="fretboard" id="chord-fretboard" role="group" aria-label="Chord voicing: 6 strings, one position per string, frets 0 to 24"></div></div>
+        <div class="board-caption"><div class="legend"><span><i class="legend-dot selected-dot"></i> Your chord</span><span><i class="legend-dot multicolor-dot"></i> Progression chords</span></div><span class="board-hint">One note per string · × = muted · 0 = open <span class="mobile-scroll-hint">· scroll →</span></span></div>
+        <div class="overlay-toolbar" id="overlay-toolbar" hidden><div class="overlay-toggles" id="overlay-toggles" aria-label="Toggle progression chords"></div><div class="overlay-options"><label for="overlay-mode" class="sr-only">Progression display</label><select id="overlay-mode"><option value="shapes">Compact shapes</option><option value="tones">All chord tones</option></select><button class="text-button" id="toggle-overlays">Hide all</button></div></div>
+        <div class="chord-entry-bar"><div class="draft-info"><span class="selection-label">CURRENT CHORD</span><strong id="draft-name">No chord</strong><span id="draft-notes">Select at least two different notes.</span></div><div class="chord-identity"><label for="chord-identity">Chord interpretation</label><select id="chord-identity" disabled><option>Select notes first</option></select><label for="custom-root" id="custom-root-label" hidden>Custom chord root</label><select id="custom-root" hidden></select></div><div class="draft-actions"><button class="secondary-button" id="chord-clear" disabled>Clear</button><button class="primary-button" id="save-chord" disabled>Save chord &amp; clear <span aria-hidden="true">+</span></button></div></div>
+      </section>
+      <p class="action-status" id="chord-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="chord-workspace">
+        <section class="utility-panel sequence-panel" aria-labelledby="sequence-title"><div class="panel-heading"><div><h2 id="sequence-title">Saved sequence <span class="small-count" id="sequence-count">0</span></h2><p>This tab only. Reorder chords to change the analysis.</p></div><button class="text-button" id="sequence-clear" disabled>Clear list</button></div><p class="storage-note" id="storage-note" hidden>Session storage is unavailable. This list will last until you reload.</p><div class="sequence-empty" id="sequence-empty"><p>Save chords from the fretboard to build a sequence.</p><button class="secondary-button" id="sequence-example">Load example sequence</button></div><ol class="saved-chords" id="saved-chords" aria-label="Saved chord sequence"></ol><div class="analysis-section"><h3>Sequence analysis</h3><p class="panel-note" id="analysis-note">Save at least two chords to analyze their order.</p><div id="progression-matches"></div><details id="key-readings" hidden><summary id="key-summary">Possible key readings</summary><div id="key-results"></div></details></div></section>
+        <section class="utility-panel builder-panel" aria-labelledby="builder-title"><div class="panel-heading"><div><h2 id="builder-title">Progression builder</h2><p>Choose a pattern, then click the degree your chord should occupy.</p></div></div><div class="builder-controls"><label for="builder-source">Use this chord</label><select id="builder-source"><option value="current">Current fretboard</option></select><label for="progression-template">Progression</label><select id="progression-template"></select></div><div class="anchor-steps" id="anchor-steps" role="group" aria-label="Choose the anchor degree"></div><p class="panel-note" id="anchor-hint">Enter or load a chord to choose its place in the progression.</p><label class="power-mode-label"><input type="checkbox" id="power-mode"> Use power chords for the other steps</label><div class="builder-result" id="builder-result" hidden><div class="builder-result-heading"><strong id="builder-key"></strong><span class="subtle-label">Click colored chords to toggle them on the fretboard.</span></div><div class="generated-chords" id="generated-chords"></div><p class="panel-note" id="builder-note"></p><button class="secondary-button" id="add-progression">Add progression to sequence</button></div></section>
       </div>
-      <button class="example-button" id="example"><span class="example-icon">↗</span><span>Не знаете, с чего начать?<strong>Попробуйте E · G · B <span aria-hidden="true">→</span></strong></span></button>
-    </section>
-
-    <section class="fretboard-card" aria-labelledby="fretboard-title">
-      <div class="card-toolbar">
-        <div class="section-title"><span class="section-number">01</span><h2 id="fretboard-title">Ваш гриф</h2><span class="tuning-badge">E A D G B E</span></div>
-        <div class="board-options">
-          <label class="switch-label"><input type="checkbox" id="show-names"><span class="switch" aria-hidden="true"></span><span>Все ноты</span></label>
-          <div class="notation-control" role="group" aria-label="Обозначения нот"><button id="sharps" class="is-current" aria-pressed="true" title="Обозначать диезами">♯</button><button id="flats" aria-pressed="false" title="Обозначать бемолями">♭</button></div>
-        </div>
-      </div>
-      <div class="fretboard-scroll" id="fretboard-scroll" tabindex="0" aria-label="Гитарный гриф. На узком экране прокрутите вправо, чтобы увидеть все 24 лада.">
-        <div class="fretboard" id="fretboard" role="group" aria-label="6 струн, лады с 0 по 24"></div>
-      </div>
-      <div class="board-caption">
-        <div class="legend"><span><i class="legend-dot selected-dot"></i> Ваши ноты</span><span><i class="legend-dot scale-dot"></i> Ноты гаммы</span><span><i class="legend-dot tonic-dot"></i> Тоника</span></div>
-        <span class="board-hint">0 — открытая струна <span class="mobile-scroll-hint">· листайте гриф →</span></span>
-      </div>
-      <div class="selection-bar">
-        <div class="selection-content"><span class="selection-label">ВЫБРАНО <span id="note-count">0</span></span><div class="note-chips" id="selected-notes" aria-label="Выбранные ноты"><span class="empty-selection">Нажмите на гриф, чтобы добавить ноты</span></div></div>
-        <button class="clear-button" id="clear" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5a5.5 5.5 0 1 1-1 5M3 1v4h4"/></svg> Очистить</button>
-      </div>
-    </section>
-
-    <section class="results-section" aria-labelledby="results-title">
-      <div class="results-heading">
-        <div class="section-title"><span class="section-number">02</span><h2 id="results-title">Подходящие гаммы</h2><span class="match-badge" id="match-badge">156 <span>/ 156</span></span></div>
-        <span class="results-hint"><span class="cursor-icon" aria-hidden="true">↖</span> Нажмите на гамму, чтобы увидеть её на грифе</span>
-      </div>
-      <div class="scale-inspector" id="scale-inspector" hidden>
-        <div class="inspector-name"><span class="inspector-eyebrow">НА ГРИФЕ</span><strong id="active-scale-name"></strong><span id="active-scale-fit"></span></div>
-        <div id="active-scale-notes" class="scale-note-list" aria-label="Ноты и ступени гаммы"></div>
-        <button class="inspector-close" id="hide-scale" aria-label="Скрыть гамму" title="Скрыть гамму">×</button>
-      </div>
-      <p class="no-matches" id="no-matches" hidden>Подходящих гамм нет. Уберите одну из выбранных нот или нажмите на любую гамму для сравнения.</p>
-      <div class="table-scroll" tabindex="0" aria-label="Таблица гамм. На узком экране прокрутите вправо, чтобы увидеть все тоники.">
-        <table id="scale-table"><caption class="sr-only">Типы гамм по строкам, все 12 тоник по столбцам. Потухшие гаммы не содержат все выбранные ноты.</caption><thead><tr id="tonic-headings"><th scope="col" class="scale-label-heading">ЛАД / ТОНИКА <span aria-hidden="true">→</span></th></tr></thead><tbody id="scale-rows"></tbody></table>
-      </div>
-      <div class="table-caption"><span id="results-description" role="status" aria-live="polite" aria-atomic="true">Пока выбраны все гаммы. Добавьте ноты, чтобы сузить поиск.</span><div class="table-legend"><span><i class="available-dot"></i> Подходит</span><span><i class="muted-dot"></i> Не подходит</span></div></div>
-    </section>
-    <footer><span class="footer-brand">ЛАД.</span><span>Меньше поиска. Больше музыки.</span><span class="footer-tech">13 типов гамм · 12 тоник · 24 лада</span></footer>
+    </div>
+    <footer><span class="footer-brand">Guitar Utilities</span><span class="footer-tech">Standard tuning · 6 strings · 24 frets</span></footer>
   </main>
-
-  <dialog id="help-dialog" aria-labelledby="help-title">
-    <button class="dialog-close" id="help-close" aria-label="Закрыть справку">×</button>
-    <p class="eyebrow">НЕБОЛЬШАЯ ПОДСКАЗКА</p><h2 id="help-title">Найдите общее звучание.</h2>
-    <ol class="help-steps"><li><strong>Выберите ноты</strong><p>Нажимайте на лады или на нулевой лад открытой струны. На одной струне можно выбрать несколько нот. Повторное нажатие убирает ноту.</p></li><li><strong>Посмотрите на таблицу</strong><p>Яркими остаются гаммы, содержащие все ваши ноты. Октавы и повторения не влияют на результат. Диезы и бемоли обозначают одни и те же звуки.</p></li><li><strong>Сравните с гаммой</strong><p>Нажмите на любую ячейку, даже потухшую. Ноты гаммы появятся на всём грифе полупрозрачными кругами, тоника — с контуром. Нажмите ещё раз, чтобы скрыть её.</p></li></ol>
-    <p class="help-footnote">Стандартный строй: E₂ A₂ D₃ G₃ B₃ E₄, тонкая струна сверху. Мелодический минор показан в восходящем (джазовом) виде. Названия нот на грифе хроматические; энгармонические ступени могут записываться иначе в нотной записи.</p>
-    <button id="help-done" class="primary-button">К музыке <span aria-hidden="true">→</span></button>
-  </dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close" id="help-close" aria-label="Close help">×</button><h2 id="help-title">Help</h2><div class="help-content"><h3>Scale finder</h3><p>Click any fret or open string to toggle a note. Multiple notes per string are allowed. Bright cells contain every selected pitch class; dimmed cells remain available for comparison. Click a scale twice to turn its overlay on and off.</p><h3>Chords &amp; sequences</h3><p>Choose one position per string. Click it again, or click its string label, to mute the string. Select a chord interpretation if more than one name fits. Custom note sets need a root. Save adds the chord to the temporary list and clears the fretboard.</p><p>Chord order is matched against common patterns, including rotations and repeated cycles. Partial matches are labeled. Power chords lack a third, so their major/minor interpretation depends on context. A match is a possible reading, not a unique identification of a key. Rhythm is not analyzed.</p><h3>Progression builder</h3><p>Use the current chord or a saved chord. Pick a pattern, then click a compatible degree. Other chords are calculated from that anchor. Incompatible degrees are disabled. Colors show compact voicings or all chord tones. Shared positions have multiple color sectors. Toggle individual chords to compare them.</p><p>Power-chord anchors use power chords for the other steps by default. Turn the option off to use the template’s full chords. Compact voicings contain every chord tone within a four-fret span; finger assignments are not evaluated. The entered anchor voicing stays unchanged.</p><h3>Keyboard &amp; storage</h3><p>Use arrow keys within a fretboard or scale table, Home/End for the first/last fret or tonic, and Enter/Space to select. Arrow keys also switch tool tabs. The saved sequence stays in this browser tab across reloads, until the tab closes. Chord and note data is not uploaded.</p><p class="help-footnote">Standard tuning: E₂ A₂ D₃ G₃ B₃ E₄, thin string at the top. Melodic minor is the ascending/jazz form. Note labels use chromatic sharp/flat names rather than theoretical enharmonic spelling.</p></div><button id="help-done" class="primary-button">Close help</button></dialog>
 </body>
 </html>
