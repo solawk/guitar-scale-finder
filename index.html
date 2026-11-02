@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141815">
+  <meta name="description" content="Выберите ноты на гитарном грифе и найдите подходящие гаммы. 24 лада, 13 типов гамм, все 12 тоник. Без библиотек.">
+  <title>ЛАД — от нот к гамме</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="./" class="brand" aria-label="ЛАД — на главную">
+      <svg viewBox="0 0 30 30" aria-hidden="true"><path d="M7 4v22M15 4v22M23 4v22M3 10h24M3 20h24"/><circle cx="15" cy="15" r="3"/></svg>
+      <span>ЛАД<span class="brand-dot">.</span></span>
+    </a>
+    <span class="header-label">ПРОСТРАНСТВО ДЛЯ ИМПРОВИЗАЦИИ</span>
+    <button class="help-button" id="help-open" aria-haspopup="dialog"><span class="help-icon">?</span> Как это работает</button>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span></span> КОНСТРУКТОР ГИТАРНЫХ ГАММ</p>
+        <h1 id="page-title">От нот — к <em>гамме.</em></h1>
+        <p class="intro-description">Выберите ноты на грифе. Найдите гаммы, в которых они звучат.</p>
+      </div>
+      <button class="example-button" id="example"><span class="example-icon">↗</span><span>Не знаете, с чего начать?<strong>Попробуйте E · G · B <span aria-hidden="true">→</span></strong></span></button>
+    </section>
+
+    <section class="fretboard-card" aria-labelledby="fretboard-title">
+      <div class="card-toolbar">
+        <div class="section-title"><span class="section-number">01</span><h2 id="fretboard-title">Ваш гриф</h2><span class="tuning-badge">E A D G B E</span></div>
+        <div class="board-options">
+          <label class="switch-label"><input type="checkbox" id="show-names"><span class="switch" aria-hidden="true"></span><span>Все ноты</span></label>
+          <div class="notation-control" role="group" aria-label="Обозначения нот"><button id="sharps" class="is-current" aria-pressed="true" title="Обозначать диезами">♯</button><button id="flats" aria-pressed="false" title="Обозначать бемолями">♭</button></div>
+        </div>
+      </div>
+      <div class="fretboard-scroll" id="fretboard-scroll" tabindex="0" aria-label="Гитарный гриф. На узком экране прокрутите вправо, чтобы увидеть все 24 лада.">
+        <div class="fretboard" id="fretboard" role="group" aria-label="6 струн, лады с 0 по 24"></div>
+      </div>
+      <div class="board-caption">
+        <div class="legend"><span><i class="legend-dot selected-dot"></i> Ваши ноты</span><span><i class="legend-dot scale-dot"></i> Ноты гаммы</span><span><i class="legend-dot tonic-dot"></i> Тоника</span></div>
+        <span class="board-hint">0 — открытая струна <span class="mobile-scroll-hint">· листайте гриф →</span></span>
+      </div>
+      <div class="selection-bar">
+        <div class="selection-content"><span class="selection-label">ВЫБРАНО <span id="note-count">0</span></span><div class="note-chips" id="selected-notes" aria-label="Выбранные ноты"><span class="empty-selection">Нажмите на гриф, чтобы добавить ноты</span></div></div>
+        <button class="clear-button" id="clear" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5a5.5 5.5 0 1 1-1 5M3 1v4h4"/></svg> Очистить</button>
+      </div>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-heading">
+        <div class="section-title"><span class="section-number">02</span><h2 id="results-title">Подходящие гаммы</h2><span class="match-badge" id="match-badge">156 <span>/ 156</span></span></div>
+        <span class="results-hint"><span class="cursor-icon" aria-hidden="true">↖</span> Нажмите на гамму, чтобы увидеть её на грифе</span>
+      </div>
+      <div class="scale-inspector" id="scale-inspector" hidden>
+        <div class="inspector-name"><span class="inspector-eyebrow">НА ГРИФЕ</span><strong id="active-scale-name"></strong><span id="active-scale-fit"></span></div>
+        <div id="active-scale-notes" class="scale-note-list" aria-label="Ноты и ступени гаммы"></div>
+        <button class="inspector-close" id="hide-scale" aria-label="Скрыть гамму" title="Скрыть гамму">×</button>
+      </div>
+      <p class="no-matches" id="no-matches" hidden>Подходящих гамм нет. Уберите одну из выбранных нот или нажмите на любую гамму для сравнения.</p>
+      <div class="table-scroll" tabindex="0" aria-label="Таблица гамм. На узком экране прокрутите вправо, чтобы увидеть все тоники.">
+        <table id="scale-table"><caption class="sr-only">Типы гамм по строкам, все 12 тоник по столбцам. Потухшие гаммы не содержат все выбранные ноты.</caption><thead><tr id="tonic-headings"><th scope="col" class="scale-label-heading">ЛАД / ТОНИКА <span aria-hidden="true">→</span></th></tr></thead><tbody id="scale-rows"></tbody></table>
+      </div>
+      <div class="table-caption"><span id="results-description" role="status" aria-live="polite" aria-atomic="true">Пока выбраны все гаммы. Добавьте ноты, чтобы сузить поиск.</span><div class="table-legend"><span><i class="available-dot"></i> Подходит</span><span><i class="muted-dot"></i> Не подходит</span></div></div>
+    </section>
+    <footer><span class="footer-brand">ЛАД.</span><span>Меньше поиска. Больше музыки.</span><span class="footer-tech">13 типов гамм · 12 тоник · 24 лада</span></footer>
+  </main>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <button class="dialog-close" id="help-close" aria-label="Закрыть справку">×</button>
+    <p class="eyebrow">НЕБОЛЬШАЯ ПОДСКАЗКА</p><h2 id="help-title">Найдите общее звучание.</h2>
+    <ol class="help-steps"><li><strong>Выберите ноты</strong><p>Нажимайте на лады или на нулевой лад открытой струны. На одной струне можно выбрать несколько нот. Повторное нажатие убирает ноту.</p></li><li><strong>Посмотрите на таблицу</strong><p>Яркими остаются гаммы, содержащие все ваши ноты. Октавы и повторения не влияют на результат. Диезы и бемоли обозначают одни и те же звуки.</p></li><li><strong>Сравните с гаммой</strong><p>Нажмите на любую ячейку, даже потухшую. Ноты гаммы появятся на всём грифе полупрозрачными кругами, тоника — с контуром. Нажмите ещё раз, чтобы скрыть её.</p></li></ol>
+    <p class="help-footnote">Стандартный строй: E₂ A₂ D₃ G₃ B₃ E₄, тонкая струна сверху. Мелодический минор показан в восходящем (джазовом) виде. Названия нот на грифе хроматические; энгармонические ступени могут записываться иначе в нотной записи.</p>
+    <button id="help-done" class="primary-button">К музыке <span aria-hidden="true">→</span></button>
+  </dialog>
+</body>
+</html>
